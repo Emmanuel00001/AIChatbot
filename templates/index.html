@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIChatbot</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-container {
+            width: 420px;
+            background: #16213e;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            text-align: center;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .chat-box {
+            height: 380px;
+            overflow-y: auto;
+            background: #0f3460;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            padding: 10px 14px;
+            border-radius: 12px;
+            max-width: 80%;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            background: #00d4ff;
+            color: #1a1a2e;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .bot-message {
+            background: #e94560;
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            background: #0f3460;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input::placeholder { color: #888; }
+
+        button {
+            padding: 12px 20px;
+            background: #00d4ff;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover { background: #00b8d9; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>🤖 AIChatbot</h1>
+        <div class="chat-box" id="chatBox">
+            <div class="message bot-message">Hello! I'm AIChatbot. How can I help you today?</div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Type a message..." onkeypress="handleKey(event)"/>
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function handleKey(event) {
+            if (event.key === "Enter") sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById("userInput");
+            const chatBox = document.getElementById("chatBox");
+            const message = input.value.trim();
+            if (!message) return;
+
+            chatBox.innerHTML += `<div class="message user-message">${message}</div>`;
+            input.value = "";
+
+            const res = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await res.json();
+            chatBox.innerHTML += `<div class="message bot-message">${data.response}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
